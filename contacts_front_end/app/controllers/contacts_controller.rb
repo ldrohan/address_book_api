@@ -1,8 +1,15 @@
 class ContactsController < ApplicationController
-  before_action :load_contact, only: [:show, :edit, :update, :destroy]
+  before_action :load_contact, only: [:show, :edit, :update, :destroy, :new_email, :sent_email]
 
   def index
     @contacts = current_user.contacts
+    # @contact = Contact.all
+    # respond_with(@contact)
+    # respond_to do |format|
+    #   format.html
+    #   format.xml { render xml: @movies }
+    #   format.json { render json: @movies }
+    # end
   end
 
   def show
@@ -18,9 +25,9 @@ class ContactsController < ApplicationController
     if @contact.save
       redirect_to root_path
     else
-      flash[:errors] = @contact.errors.full_messages
-      render :new
-    end
+    flash[:errors] = @contact.errors.full_messages
+    render :new  
+   end
   end
 
   def edit
@@ -42,16 +49,22 @@ class ContactsController < ApplicationController
   end
 
   def new_email
-    # Should return a view that allows the user to create an email
+   
+   load_contact
+   render :new_email
   end
 
   def send_email
+    response = Typhoeus.post("localhost:3001/email.json", params: {contact: params[:email]})
+binding.pry
+    redirect_to email_sent_path
     # Does the actual sending of the email by calling
     # the other rails server
   end
 
   def sent_email
     # A response page that shows that the user's email got sent
+
   end
 
   private
